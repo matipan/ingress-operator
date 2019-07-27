@@ -495,7 +495,11 @@ func makeAnnotations(function *faasv1.FunctionIngress) map[string]string {
 	}
 
 	if function.Spec.UseTLS() {
-		annotations["certmanager.k8s.io/issuer"] = function.Spec.TLS.IssuerRef.Name
+		kind := "certmanager.k8s.io/issuer"
+		if function.Spec.TLS.IssuerRef.Kind == "ClusterIssuer" {
+			kind = "certmanager.k8s.io/cluster-issuer"
+		}
+		annotations[kind] = function.Spec.TLS.IssuerRef.Name
 		annotations["certmanager.k8s.io/acme-challenge-type"] = "http01"
 	}
 
